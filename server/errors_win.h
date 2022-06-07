@@ -1,0 +1,23 @@
+//
+// Created by hugoc on 09/06/2021.
+//
+
+#ifndef ERRORS_WIN_H
+#define ERRORS_WIN_H
+
+#define SUCCESS 0
+#define FAILURE -1
+#define ERROR_MEMORY -100
+#define ERROR_OVERFLOW -101
+#define ERROR_EVT_ADD_TRIGGER -102
+#define ERROR_UNDERFLOW -103
+#define ERROR_QUEUE_VIRTUAL_WRITE -104
+#define ERROR_SEND -105
+#define ERROR_VC_WRITE -106
+#define ERROR_INDEX_RANGE -107
+#define ERROR_CLOSE_CONNECTION -108
+#define ERROR_WINDOW_FULL -109
+#define ERROR_FATAL -110
+#define ERROR_NULL_POINTER -111
+
+#endif //ERRORS_WIN_H
