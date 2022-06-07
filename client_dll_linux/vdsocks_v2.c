@@ -25,11 +25,15 @@ pVD_CALLBACK_ARGS g_pVdCallbackArgs = NULL; //for debug only
 __attribute__((unused)) int DriverOpen(PVD pVd, PVDOPEN pVdOpen, PUINT16 puiSize) {
 
     char basePath[180];
+    int port = LISTENING_PORT;
+    char address[15];
     miGetPrivateProfileString(VIRTUAL_CHANNEL_NAME, "LogPath", "", basePath, 180); //FIXME : check bufferoverflow
+    port = miGetPrivateProfileInt(VIRTUAL_CHANNEL_NAME, "Port", LISTENING_PORT);
+    miGetPrivateProfileString(VIRTUAL_CHANNEL_NAME, "Address", LISTENING_ADDRESS, address, 15);
     DebugInit(basePath);
 
     DEBUG(pSQueueFile, "init\n")
-
+    DEBUG_VAR(pFile, "port : %d.\n", port)
     DEBUG(pFile, "Entering\n")
 
 
@@ -184,7 +188,7 @@ __attribute__((unused)) int DriverOpen(PVD pVd, PVDOPEN pVdOpen, PUINT16 puiSize
 
 
     int listening_socket;
-    if(FAILURE ==(listening_socket = OpenListeningSocket(LISTENING_PORT))){
+    if(FAILURE ==(listening_socket = OpenListeningSocket(port, address))){
         DEBUG(pFile, "Error OpenListeningSocket. Exting.\n");
         DEBUG(pErrorFile, "Error OpenListeningSocket. Exting.\n");
         exit(1);
@@ -1404,7 +1408,7 @@ int Handler_Ica_CloseAck(pCONNECTION_MANAGER pConnectionManager, pEPOLL_ARGS pEp
  * @param port The port to listen to.
  * @return The listening socket just created or FAILURE
  */
-int OpenListeningSocket(unsigned short port) {
+int OpenListeningSocket(unsigned short port, unsigned char * addr) {
     DEBUG(pFile, "Entering\n");
     DEBUG(pFile, "No listening socket, creating it...\n");
 
@@ -1428,7 +1432,8 @@ int OpenListeningSocket(unsigned short port) {
 
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    //address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr(addr);
     address.sin_port = htons(port);
 
 

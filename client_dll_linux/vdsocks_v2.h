@@ -56,6 +56,7 @@
 
 
 #define LISTENING_PORT 33556
+#define LISTENING_ADDRESS "127.0.0.1"
 
 extern int Load();
 
@@ -183,7 +184,7 @@ int Handler_Ica_CloseRequest(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARG
 int Handler_Ica_CloseAck(pCONNECTION_MANAGER pConnectionManager, pEPOLL_ARGS pEpollArgs, ID id);
 
 
-int OpenListeningSocket(unsigned short port);
+int OpenListeningSocket(unsigned short port, unsigned char *);
 
 void debug_info(FILE *fd);
 

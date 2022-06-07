@@ -33,6 +33,8 @@ Then, modify the `<CITRIX_INSTALL_FOLER>/ICAClient/config/module.ini` configurat
 ```
 DriverName = <DRIVER_NAME>.DLL
 LogPath = /path/to/logs/folder/
+Port = <PORT_NUMBER_FOR_SOCKS>  //default: 33556
+Address = <LISTENING_IP_ADDRESS>  //default: 127.0.0.1, use 0.0.0.0 to open the socks for non local clients
 ```
 
 That's all!
@@ -40,4 +42,4 @@ That's all!
 # Usage
 
 Once the client side driver is correctly installed, you just need to copy the server binary on the server and execute it from an active ICA session.
-It opens a SOCKS service on the client side on port 33556.
+It opens a SOCKS service on the client side on the address and port specified in the `module.ini` file.
