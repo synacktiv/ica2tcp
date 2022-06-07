@@ -14,12 +14,6 @@
 #include "errors_win.h"
 #include "debug_win.h"
 
-#define SUCCESS 0
-#define FAILURE 1
-
-
-#define LOG_PATH "C:\Users\User1\Desktop\debug.txt"
-#define POLL_LOG_PATH "C:\Users\User1\Desktop\debugpoll.txt"
 
 typedef struct _MEMORY_SECTION {
 	unsigned int length;

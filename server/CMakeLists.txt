@@ -34,13 +34,13 @@ include_directories(../citrix_sdk_files/vcsdk_win32/include/shared/)
 # wfapi headers (wfapi.h and CtxSmcApi.h)
 include_directories(../citrix_sdk_files/wfapi_sdk_win32/include/)
 
-add_executable(ica2tcp_server ctxsocks_v2.c  connection_manager_win.c debug_win.c  socket_queue_win.c)
+add_executable(ica2tcp_server ctxsocks_v2.c  connection_manager_win.c socket_queue_win.c)
 set_target_properties(ica2tcp_server PROPERTIES OUTPUT_NAME_RELEASE "server")
 set_target_properties(ica2tcp_server PROPERTIES OUTPUT_NAME_DEBUG "server_debug")
 
 # Link the WFAPI SDK static library 
 target_link_libraries(ica2tcp_server ${CMAKE_SOURCE_DIR}/../citrix_sdk_files/wfapi_sdk_win32/lib/wfapi.lib)
 
-# Link WinSock library
+# Link WinSock library (change the HINTS path if mingw is not installed there)
 find_library(WS2_32_LIB libws2_32.a HINTS /usr/i686-w64-mingw32/lib)
 target_link_libraries(ica2tcp_server ${WS2_32_LIB})

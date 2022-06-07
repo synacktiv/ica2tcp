@@ -1,10 +1,11 @@
 # About Ica2Tcp
 
 Ica2Tcp is a C tool allowing to proxy any TCP connection inside an Citrix ICA connection. It is to Citrix what `ssh -D` is to SSH.
+Additional information can be found here: https://www.sstic.org/2022/presentation/ica2tcp/
 
 # Disclaimer
 
-This tool was developped as an internship project and is still under developpment. It is published "as is", so some parts of the code are still a bit dirty. A cleaner version is in progress and will be released soon.
+This tool was developped as an internship project and is still under developpment. It is published "as is", so some parts of the code are still a bit dirty. Thus, you may experience some occasional crashes. A cleaner version is in progress and will be released soon.
 However, any remark concerning this version is welcome !
 
 # Build the tool
@@ -14,11 +15,11 @@ Please refer to the corresponding README for more details:
 - [Server binary](./server/)
 - [Client shared library](./client_dll_linux/) 
 
-For convenience, all the required Citrix headers and libraries have been included in this repository ([here](/citrix_sdk_files/)). They all originate from the Virtual Channel SDK and WFAPI SDK that are publicly available: 
+For convenience, all the required Citrix headers and libraries (for the Linux64 client et Win32 server) have been included in this repository ([here](/citrix_sdk_files/)). They all originate from the Virtual Channel SDK and WFAPI SDK that are publicly available: 
 - https://www.citrix.com/downloads/workspace-app/virtual-channel-sdks/virtual-channel-sdk.html
 - https://developer.cloud.com/archived-sdks/docs/archived-sdks#winframe-api-sdk 
   
-Feel free to manually download and install the SDK's, however you might have to change the build process a bit.
+The `CMakeLists.txt` files in this repository allow building the server and client binaries with those included files. If you want to the latest SDK files or build for another target architecture, feel free to manually download and install the SDK's, however you might have to change the corresponding `CMakeLists.txt`.
 
 # Install 
 

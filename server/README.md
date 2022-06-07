@@ -17,7 +17,7 @@ apt install cmake
 ```
 
 ### Install Citrix SDKs
-To build the server side executable, some files of the Virtual Channel SDK are needed, as well as the WFAPI SDK. The WFAPI SDK is provided by Citrix as a `.msi`. So the easiest way is to use all the Citrix files provided in this repository (you do not need to do anything). However, it is possible to manually download and install the SDKs (VCSDK for Windows and WFAPI SDK). In this case, you need to update `CMakeLists.txt` with the right paths to the different files required:
+To build the server side executable, some files of the Virtual Channel SDK are needed, as well as the WFAPI SDK. The WFAPI SDK is provided by Citrix as a `.msi`. So the easiest way is to use all the Citrix files provided in this repository (you do not need to do anything). However, it is possible to manually download and install the SDKs (VCSDK for Windows and WFAPI SDK). In this case, you need to update [`CMakeLists.txt`](./CMakeLists.txt) with the right paths to the different files required:
 - Link the `wfapi.lib` static library
 - Add the path to `wfapi.h` and `CtxSmcApi.h` header files
 - Add the path to `ica.h`, `ica-c2h.h`, `icaid.h`, `vrtlclss.h` header files

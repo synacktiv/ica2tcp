@@ -3,18 +3,10 @@
 #define __COMMON_H__
 
 
-#ifdef Linux
-#ifdef SDK
-#include <citrix/ica.h>
-#include <citrix/ica-c2h.h>       /* for VD_C2H structure */
-#else
+
 #include <ica.h>
 #include <ica-c2h.h>
-#endif
-#else
-#include "ica.h"
-#include "ica-c2h.h"
-#endif
+
 
 #define VIRTUAL_CHANNEL_NAME "CTXSCKS"
 #define MAX_ICA_PACKET_DATA_SIZE 2048
@@ -57,13 +49,13 @@
 #define DOMSTR_TYPE unsigned char *
 
 
-typedef  LEN_TYPE LEN;
+typedef LEN_TYPE LEN;
 typedef PACKET_TYPE_TYPE PACKET_TYPE;
 typedef VER_TYPE VER;
 typedef CMD_TYPE CMD;
 typedef IPADDR_TYPE IPADDR;
 typedef IP6ADDR_TYPE IP6ADDR;
-typedef  PORT_TYPE PORT;
+typedef PORT_TYPE PORT;
 typedef RPL_TYPE RPL;
 typedef ATYP_TYPE ATYP;
 typedef DOMLEN_TYPE DOMLEN;

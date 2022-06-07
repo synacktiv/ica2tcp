@@ -60,5 +60,3 @@
 
 
 #endif //DEBUG_WIN_H
-
-void DebugInit();
