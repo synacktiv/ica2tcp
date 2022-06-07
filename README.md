@@ -11,8 +11,8 @@ However, any remark concerning this version is welcome !
 
 Both the server side standalone binary and the client side shared library must be built.
 Please refer to the corresponding README for more details:
-- [Server binary](./server/README.md)
-- [Client shared library](./client_dll_linux/README.md) 
+- [Server binary](./server/)
+- [Client shared library](./client_dll_linux/) 
 
 For convenience, all the required Citrix headers and libraries have been included in this repository ([here](/citrix_sdk_files/)). They all originate from the Virtual Channel SDK and WFAPI SDK that are publicly available: 
 - https://www.citrix.com/downloads/workspace-app/virtual-channel-sdks/virtual-channel-sdk.html
