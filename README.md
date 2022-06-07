@@ -15,11 +15,11 @@ Please refer to the corresponding README for more details:
 - [Server binary](./server/)
 - [Client shared library](./client_dll_linux/) 
 
-For convenience, all the required Citrix headers and libraries (for the Linux64 client et Win32 server) have been included in this repository ([here](/citrix_sdk_files/)). They all originate from the Virtual Channel SDK and WFAPI SDK that are publicly available: 
+For convenience, all the required Citrix headers and libraries (for the Linux64 client et Win32 server) have been included in this repository (in [citrix_sdk_files/](/citrix_sdk_files/)). They all originate from the Virtual Channel SDK and WFAPI SDK that are publicly available: 
 - https://www.citrix.com/downloads/workspace-app/virtual-channel-sdks/virtual-channel-sdk.html
 - https://developer.cloud.com/archived-sdks/docs/archived-sdks#winframe-api-sdk 
   
-The `CMakeLists.txt` files in this repository allow building the server and client binaries with those included files. If you want to the latest SDK files or build for another target architecture, feel free to manually download and install the SDK's, however you might have to change the corresponding `CMakeLists.txt`.
+The `CMakeLists.txt` files in this repository allow building the server and client binaries with those included files. If you want to use the latest SDK files or build for another target architecture, feel free to manually download and install the SDK's, however you might have to change the corresponding `CMakeLists.txt`.
 
 # Install 
 
