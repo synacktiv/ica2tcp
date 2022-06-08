@@ -1,12 +1,12 @@
 # About Ica2Tcp
 
-Ica2Tcp is a C tool allowing to proxy any TCP connection inside an Citrix ICA connection. It is to Citrix what `ssh -D` is to SSH.
+Ica2Tcp is a tool developed in C allowing to proxy any TCP connection inside a Citrix ICA connection. It is to Citrix what `ssh -D` is to SSH.
 Additional information can be found here: https://www.sstic.org/2022/presentation/ica2tcp/
 
 # Disclaimer
 
-This tool was developped as an internship project and is still under developpment. It is published "as is", so some parts of the code are still a bit dirty. Thus, you may experience some occasional crashes. A cleaner version is in progress and will be released soon.
-However, any remark concerning this version is welcome !
+This tool was developped as an internship project and is still under development. It is published "as is", so some parts of the code are still a bit dirty. Thus, you may experience some occasional crashes. A cleaner version is in progress and will be released soon.
+However, any remark concerning this version is welcome!
 
 # Build the tool
 
