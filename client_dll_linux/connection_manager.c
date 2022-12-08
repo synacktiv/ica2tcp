@@ -61,6 +61,7 @@ int ConnectionManager_Init(pCONNECTION_MANAGER * ppConnectionManager){
         pConnectionManager->connection_list[i].state = FREE;
         pConnectionManager->connection_list[i].pSocketQueue = NULL;
         pConnectionManager->connection_list[i].window = -1;
+        pConnectionManager->connection_list[i].tmpId = -1;
     }
     pConnectionManager->n_connection = 0;
 
@@ -123,6 +124,7 @@ int ConnectionManager_Resize(pCONNECTION_MANAGER pConnectionManager){
             pConnectionManager->connection_list[i].state = FREE;
             pConnectionManager->connection_list[i].pSocketQueue = NULL;
             pConnectionManager->connection_list[i].window = -1;
+            pConnectionManager->connection_list[i].tmpId = -1;
         }
 
 
@@ -178,6 +180,7 @@ int ConnectionManager_NewConnection(pCONNECTION_MANAGER pConnectionManager, int 
     available_row->socket_fd = new_socket;
     available_row->id = new_socket;
     available_row->window = MAX_SOCKET_QUEUE_SIZE;
+    available_row->tmpId = -1;
 
     if(NULL == (available_row->pSocketQueue = (pSOCKET_QUEUE )malloc(sizeof(SOCKET_QUEUE)))){
         DEBUG(pErrorFile, "Memory allocation error : socket_queue\n");
@@ -283,6 +286,7 @@ int ConnectionManager_CloseConnectionByIndex(pCONNECTION_MANAGER pConnectionMana
     pClosing_connection->id = pLast_connection->id;
     pClosing_connection->pSocketQueue = pLast_connection->pSocketQueue;
     pClosing_connection->window = pLast_connection->window;
+    pClosing_connection->tmpId = pLast_connection->tmpId;
     DEBUG(pFile, "3\n");
     pConnectionManager->id_mapping[pLast_connection->id] = index;
     DEBUG(pFile, "4\n");
@@ -291,6 +295,7 @@ int ConnectionManager_CloseConnectionByIndex(pCONNECTION_MANAGER pConnectionMana
     pLast_connection->id= -1;
     pLast_connection->pSocketQueue=NULL;
     pLast_connection->window = -1;
+    pLast_connection->tmpId = -1;
     DEBUG(pFile, "5\n");
 
     pConnectionManager->id_mapping[closingId] = -1;

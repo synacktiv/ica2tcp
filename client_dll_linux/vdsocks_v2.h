@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/epoll.h>
@@ -58,6 +59,9 @@
 #define LISTENING_PORT 33556
 #define LISTENING_ADDRESS "127.0.0.1"
 
+#define CTRL_LISTENING_PORT 12345
+#define CTRL_LISTENING_ADDRESS "127.0.0.1"
+
 extern int Load();
 
 struct _wrapload {
@@ -74,12 +78,62 @@ struct _wrapload {
 //    unsigned char * data_storage;
 //}ICA_PACKET_QUEUE, * pICA_PACKET_QUEUE;
 
+//struct S_GLOBALS;
+typedef enum E_COMMAND{
+    BIND,
+    REVERSE,
+    SOCKS,
+    LIST,
+    CLOSE
+}COMMAND;
+
+typedef enum E_REVERSE_STATE{
+    UNDEFINED,
+    REVERSE_CMD_SENT,
+    REVERSE_ESTABLISHED,
+    REVERSE_CLOSE_REQ_SENT,
+} REVERSE_STATE;
+
 
 typedef struct S_VC_INFO{
     PWD pWd;
     USHORT vcNum;
     USHORT maxDataSize;
 }VC_INFO, * pVC_INFO;
+
+
+typedef struct S_CTRL_CLIENT{
+    int socket;
+    PEVT pEvt;
+    struct S_GLOBALS * pGlobals;
+    //struct S_CTRL_CLIENT ** ppCtrlClientList;
+    struct S_CTRL_CLIENT * pPrev;
+    struct S_CTRL_CLIENT * pNext;
+}CTRL_CLIENT, * pCTRL_CLIENT;
+
+typedef enum E_LISTENER_TYPE{
+    UNDEF_LISTENER,
+    SOCKSLST,
+    BINDLST,
+    REVERSELST
+}LISTENER_TYPE;
+typedef struct S_LISTENER{
+    LISTENER_TYPE type;
+    int id;
+    IPADDR lclAddr;
+    IPADDR rmtAddr;
+    PORT lclPort;
+    PORT rmtPort;
+    int socket;
+    PEVT pEvt;
+    REVERSE_STATE reverseState;
+    //void * pCustomArgs;
+    struct S_GLOBALS * pGlobals;
+    struct S_LISTENER * pPrev;
+    struct S_LISTENER * pNext;
+}LISTENER, * pLISTENER;
+
+
 
 typedef struct S_ICASEND_ARGS{
     VC_INFO vcInfo;
@@ -93,31 +147,50 @@ typedef struct S_EPOLL_ARGS{
 }EPOLL_ARGS, * pEPOLL_ARGS;
 
 typedef struct S_CALLBACK_ARGS_LISTENING_SOCKET{
-    pCONNECTION_MANAGER pConnectionManager;
-    ICASEND_ARGS icasendArgs;
-    int listening_socket;
     PEVT pEvt;
-    pEPOLL_ARGS pEpollArgs;
+    int socket;
 
 }CALLBACK_ARGS_LISTENING_SOCKET, * pCALLBACK_ARGS_LISTENING_SOCKET;
+
+typedef struct S_CALLBACK_ARGS_BIND_SOCKET{
+    PEVT pEvt;
+    int socket;
+    IPADDR rmtAddr;
+    PORT rmtPort;
+}CALLBACK_ARGS_BIND_SOCKET, * pCALLBACK_ARGS_BIND_SOCKET;
+
+typedef struct S_CALLBACK_ARGS_REVERSE_SOCKET{
+    int dummy;
+}CALLBACK_ARGS_REVERSE_SOCKET, * pCALLBACK_ARGS_REVERSE_SOCKET;
+
+typedef struct S_CALLBACK_ARGS_CTRL_SOCKET{
+    int ctrl_socket;
+    struct S_GLOBALS * pGlobals;
+}CALLBACK_ARGS_CTRL_SOCKET, * pCALLBACK_ARGS_CTRL_SOCKET;
+
+
+typedef struct S_CALLBACK_ARGS_CTRL_CLIENT{
+    int ctrl_client;
+    PEVT pEvt;
+}CALLBACK_ARGS_CTRL_CLIENT, * pCALLBACK_ARGS_CTRL_CLIENT;
 
 typedef struct S_CALLBACK_ARGS_CLIENT_SOCKET{
     pCONNECTION_MANAGER pConnectionManager;
     ICASEND_ARGS icasendArgs;
     unsigned char * pSocketRecvBuf;
     pEPOLL_ARGS pEpollArgs;
+    struct S_GLOBALS * pGlobals;
 }CALLBACK_ARGS_CLIENT_SOCKET, * pCALLBACK_ARGS_CLIENT_SOCKET;
 
 typedef struct S_CALLBACK_ARGS_TIMER{
     ICASEND_ARGS  icasendArgs;
     pCONNECTION_MANAGER pConnectionManager;
     pEPOLL_ARGS pEpollArgs;
+    struct S_GLOBALS * pGlobals;
 }CALLBACK_ARGS_TIMER, * pCALLBACK_ARGS_TIMER;
 
 typedef struct S_ICA_ARRIVAL_ARGS{
-    ICASEND_ARGS icasendArgs;
-    pCONNECTION_MANAGER pConnectionManager;
-    pEPOLL_ARGS pEpollArgs;
+    struct S_GLOBALS * pGlobals;
 }ICA_ARRIVAL_ARGS;
 
 typedef struct S_DRIVER_CLOSE_ARGS{
@@ -125,13 +198,14 @@ typedef struct S_DRIVER_CLOSE_ARGS{
     unsigned char * pSocketRecvBuf;
     pICA_PACKET_QUEUE pIcaPacketQueue;
     pCALLBACK_ARGS_CLIENT_SOCKET pCallbackArgsClientSocket;
-    pCALLBACK_ARGS_LISTENING_SOCKET pCallbackArgsListeningSocket;
+    pCALLBACK_ARGS_CTRL_SOCKET pCallbackArgsCtrlSocket;
     pCALLBACK_ARGS_TIMER pCallbackArgsTimer;
-    PEVT * pPevtListeningSocket;
-    PEVT * pPevtClientSocket;
-    PTMR * pPtmr;
-    int listening_socket;
+    PEVT  pEvtCtrlSocket;
+    PEVT  pEvtClientSocket;
+    PTMR  pTmr;
+    int ctrl_socket;
     pEPOLL_ARGS pEpollArgs;
+    struct S_GLOBALS * pGlobals;
 
 }DRIVER_CLOSE_ARGS;
 
@@ -139,6 +213,19 @@ typedef struct S_VD_CALLBACK_ARGS{
     ICA_ARRIVAL_ARGS icaArrivalArgs;
     DRIVER_CLOSE_ARGS driverCloseArgs;
 }VD_CALLBACK_ARGS, * pVD_CALLBACK_ARGS;
+
+
+typedef struct S_GLOBALS{
+    pCTRL_CLIENT pCtrlClientList;
+    pLISTENER pListenerList;
+    VC_INFO vcInfo;
+    unsigned char * pSocketRecvBuf;
+    PEVT pEvtClientSocket;
+    pICA_PACKET_QUEUE pIcaPacketQueue;
+    pCONNECTION_MANAGER pConnectionManager;
+    pEPOLL_ARGS pEpollArgs;
+}GLOBALS, * pGLOBALS;
+
 
 
 
@@ -163,12 +250,16 @@ __attribute__((unused)) int DriverGetLastError( PVD, PVDLASTERROR );
 static int WFCAPI ICADataArrival(__attribute__((unused)) PVOID, __attribute__((unused)) USHORT, LPBYTE,
                                  __attribute__((unused)) USHORT );
 
-void Callback_ListeningSocket(void *pSubId, __attribute__((unused)) void *pEvt);
+// void Callback_ListeningSocket(void *pSubId, __attribute__((unused)) void *pEvt);
 void Callback_ClientSocket(void *pSubId, __attribute__((unused)) void *pEvt);
+void Callback_CtrlClient(void * arg1, void * arg2);
+void Callback_CtrlSocket(void * arg1, void * arg2);
+// void Callback_BindSocket(void * arg1, void * arg2);
+void Callback_ListenerSocket(void * arg1, void * arg2);
 void Callback_Timer(void * arg1, __attribute__((unused)) void * arg2);
 
-int Handler_Meta_ServerStart(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARGS icasendArgs, pEPOLL_ARGS pEpollArgs);
-int Handler_Meta_ServerStop(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARGS icasendArgs, pEPOLL_ARGS pEpollArgs);
+int Handler_Meta_ServerStart(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARGS icasendArgs, pEPOLL_ARGS pEpollArgs, pGLOBALS pGlobals);
+int Handler_Meta_ServerStop(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARGS icasendArgs, pEPOLL_ARGS pEpollArgs, pGLOBALS pGlobals);
 int Handler_MetaWindow(pCONNECTION_MANAGER pConnectionManager, ID id, unsigned char * pBuf);
 int
 Handler_Ica_DataPacket(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARGS icasendArgs, pEPOLL_ARGS pEpollArgs, ID id,
@@ -184,7 +275,7 @@ int Handler_Ica_CloseRequest(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARG
 int Handler_Ica_CloseAck(pCONNECTION_MANAGER pConnectionManager, pEPOLL_ARGS pEpollArgs, ID id);
 
 
-int OpenListeningSocket(unsigned short port, unsigned char *);
+int OpenListeningSocket(unsigned short port, char *);
 
 void debug_info(FILE *fd);
 
@@ -209,8 +300,14 @@ int Send_Ica_Ip6CmdPacket(ICASEND_ARGS icasendArgs, ID id, VER ver, CMD cmd, POR
 int Send_IcaQueue(ICASEND_ARGS icasendArgs);
 int
 Send_Ica_DomainCmdPacket(ICASEND_ARGS icasendArgs, ID id, VER ver, CMD cmd, PORT port, DOMLEN domLen, DOMSTR pDomData);
+int Send_Ica_ReverseBindCmdPacket(ICASEND_ARGS icasendArgs, ID id, IPADDR rmtAddr, PORT rmtPort);
+int Send_Ica_ReverseCloseRequest(ICASEND_ARGS icasendArgs, ID reverseBindId);
+int Send_Ica_ReverseCloseAck(ICASEND_ARGS icasendArgs, ID reverseBindId);
+int Send_Ica_ReverseConnectRplPacket(ICASEND_ARGS icasendArgs, ID defId, ID tmpId, ID revBindId, RPL rpl);
 int Send_Ica_DataPacket(ICASEND_ARGS icasendArgs, ID id, LEN len, unsigned char *pData);
 void Parse_Ica_ServerRplPacket(IN unsigned char *pPacketBuf, OUT VER *pver, OUT RPL *prpl);
+void Parse_Ica_ReverseBindRplPacket(IN unsigned char * pPacketBuf, OUT RPL * prpl);
+void Parse_Ica_ReverseConnectCmdPacket(IN unsigned char * pPacketBuf, OUT ID * pRevBindId);
 void Parse_Socket_ClientMethodsPacket(IN unsigned char *pPacketBuf, OUT VER *pver, OUT NMETHODS *pnmethods, OUT unsigned char **ppmethods);
 void
 Parse_Socket_ClientCmdPacket(unsigned char *pPacketBuf, VER *pver, CMD *pcmd, RSV *prsv, ATYP *patyp, IPADDR *pipaddr,
@@ -218,6 +315,7 @@ Parse_Socket_ClientCmdPacket(unsigned char *pPacketBuf, VER *pver, CMD *pcmd, RS
 void Parse_Ica_GenericPacket(IN unsigned char *pPacketBuf, OUT PACKET_TYPE *ptype, OUT ID *pid, OUT LEN *plen, OUT unsigned char **ppdata);
 void Parse_Ica_MetaWindow(IN const unsigned char * pPacketBuf, OUT int * pWindow);
 
+int Parse_Ctrl(IN char * buffer, IN int len, OUT COMMAND * pCmd, OUT PORT * pLclPort, OUT PORT * pRmtPort, OUT IPADDR * pLclAddr, OUT IPADDR * pRmtAddr, ID * pId);
 
 MEMORY_SECTION * IcaPacketQueue_GetHead(pICA_PACKET_QUEUE pQueue);
 int IcaPacketQueue_Dequeue(pICA_PACKET_QUEUE pQueue);
@@ -235,7 +333,13 @@ int
 InitiateCloseProcedure(pCONNECTION_MANAGER pConnectionManager, ICASEND_ARGS icasendArgs, ID id, pEPOLL_ARGS pEpollArgs);
 int CloseConnection(pCONNECTION_MANAGER pConnectionManager, pEPOLL_ARGS pEpollArgs, ID id);
 
-
+void RemoveListener(pLISTENER * pListenerList, pLISTENER pListener);
+void AddListener(pLISTENER * pListenerList, pLISTENER pListener);
+void RemoveCtrlClient(pCTRL_CLIENT *ppCtrlClientList, pCTRL_CLIENT pCtrlClient);
+void AddCtrlClient(pCTRL_CLIENT * ppCtrlClientList, pCTRL_CLIENT pCtrlClient);
+void FreeListener(pLISTENER pListener);
+pLISTENER NewListener(LISTENER_TYPE type);
+int CloseListener(pLISTENER pListener);
 
 void debugBuf(void *, int);
 

@@ -30,6 +30,8 @@ typedef enum E_CONNECTION_STATE{
     METHOD_CHOSEN,    /**< Client socket sent a list of supported SOCKS authentication methods, we chose one and sent back
                        * a method selection message */
     CMD_SENT,         /**< Client socket sent its SOCKS request and we transferred it through virtual channel to the citrix server*/
+    BIND_CMD_SENT,
+    CONNECTING,
     ESTABLISHED,      /**< Citrix server responded to the request and the SOCKS connection is established, ready to
                        * transfer data */
     CLOSING,          /**< A close request was sent to the citrix server but the connection is not closed until a close
@@ -41,6 +43,7 @@ typedef enum E_CONNECTION_STATE{
 typedef struct S_CONNECTION{
     ID id;                          /**< Unique identifier of the connection. Used server-side to demultiplex the
                                       * virtual channel flow and transfer to the right socket */
+    ID tmpId;
     CONNECTION_STATE state;         /**< Current state of the connection. */
     int socket_fd;                  /**< File descriptor representing the local socket linked with the connection*/
     pSOCKET_QUEUE pSocketQueue;     /**< Pointer to a socket queue structure. Used to queue outgoing packets for the

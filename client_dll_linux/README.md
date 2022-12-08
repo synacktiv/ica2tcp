@@ -42,8 +42,36 @@ Then, modify the `<CITRIX_INSTALL_FOLER>/ICAClient/config/module.ini` configurat
 ```
 DriverName = <DRIVER_NAME>.DLL
 LogPath = /path/to/logs/folder/
-Port = <PORT_NUMBER_FOR_SOCKS>  //default: 33556
-Address = <LISTENING_IP_ADDRESS>  //default: 127.0.0.1, use 0.0.0.0 to open the socks for non local clients
+CtrlPort = <PORT_NUMBER_FOR_CONTROLLER_SOCKET>  //default: 12345
+CtrlAddr = <CONTROLLER_SOCKET_LISTENING_IP_ADDRESS>  //default: 127.0.0.1, use 0.0.0.0 to open it for non local clients
 ```
 
 That's all!
+
+## Use the controller
+
+Once the driver is installed, and an ICA session opened, a controller socket listens on `CtrlAddr:CtrlPort`.
+
+Connect to it, for example using `netcat` and send commands.
+
+Available commands: 
+- Open a SOCKS port:
+```
+S listening_address port
+```
+- Forward a TCP local port to a remote destination:
+```
+B listening_local_address local_port remote_address_destination remote_port_destination
+``` 
+- Forward a TCP remote port to a local destination:
+```
+R local_address_destination local_port_destination remote_listening_address remote_port
+```
+- List all SOCKS, forwards and reverse forwards: *The space after L is mandatory*
+```
+L 
+```
+- Close SOCKS, forward or reverse forward: (id is obtained with the list command)
+```
+C id
+```

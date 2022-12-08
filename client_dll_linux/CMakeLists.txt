@@ -16,11 +16,16 @@ add_compile_definitions(WRAP_LOAD=ica2tcp_WrapLoad)
 add_compile_options(-Wall -v)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(DEBUG_NAME)
     add_compile_definitions(DEBUG_ON)
+    add_compile_definitions(DEBUG_ALWAYS_ON)
+    add_compile_definitions(WARN_ON)
 endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(-fstack-protector-all )
+    add_compile_definitions(DEBUG_ALWAYS_ON)
+    add_compile_definitions(WARN_ON)
     add_compile_definitions(PROD)
 endif(CMAKE_BUILD_TYPE STREQUAL "Release")
 

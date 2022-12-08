@@ -6,7 +6,7 @@
 #define ERRORS_WIN_H
 
 #define SUCCESS 0
-#define FAILURE -1
+#define FAILURE 1
 #define ERROR_MEMORY -100
 #define ERROR_OVERFLOW -101
 #define ERROR_EVT_ADD_TRIGGER -102

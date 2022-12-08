@@ -3,12 +3,24 @@
 #define __COMMON_H__
 
 
-
+#ifdef Linux
+#ifdef SDK
+#include <citrix/ica.h>
+#include <citrix/ica-c2h.h>       /* for VD_C2H structure */
+#else
 #include <ica.h>
 #include <ica-c2h.h>
+#endif
+#else
+#include "ica.h"
+#include "ica-c2h.h"
+#endif
 
-
+#ifdef DEBUG_NAME
+#define VIRTUAL_CHANNEL_NAME "CTXSCKD"
+#else
 #define VIRTUAL_CHANNEL_NAME "CTXSCKS"
+#endif
 #define MAX_ICA_PACKET_DATA_SIZE 2048
 
 #define MAX_QUEUE_SIZE 5000
@@ -18,6 +30,8 @@
 #define IN
 #define OUT
 
+#define ID_SIZE 4
+#define ID_TYPE unsigned int
 
 #define PACKET_TYPE_SIZE 1
 #define PACKET_TYPE_TYPE unsigned char
@@ -48,14 +62,14 @@
 #define MAX_DOMSTR_SIZE 256
 #define DOMSTR_TYPE unsigned char *
 
-
-typedef LEN_TYPE LEN;
+typedef ID_TYPE ID;
+typedef  LEN_TYPE LEN;
 typedef PACKET_TYPE_TYPE PACKET_TYPE;
 typedef VER_TYPE VER;
 typedef CMD_TYPE CMD;
 typedef IPADDR_TYPE IPADDR;
 typedef IP6ADDR_TYPE IP6ADDR;
-typedef PORT_TYPE PORT;
+typedef  PORT_TYPE PORT;
 typedef RPL_TYPE RPL;
 typedef ATYP_TYPE ATYP;
 typedef DOMLEN_TYPE DOMLEN;
@@ -73,6 +87,12 @@ typedef enum _PACKET_TYPE{
     SOCKS_CLIENT_DOMAIN_CMD,
     SOCKS_SERVER_RPL,
     SOCKS_DATA,
+    REVERSE_BIND_CMD,
+    REVERSE_BIND_RPL,
+    REVERSE_CONNECT_CMD,
+    REVERSE_CONNECT_RPL,
+    REVERSE_CLOSE_REQUEST,
+    REVERSE_CLOSE_ACK,
     CLOSE_REQUEST,
     CLOSE_ACK
 } PACKET_TYPE_ENUM;
@@ -81,7 +101,7 @@ typedef enum _PACKET_TYPE{
 typedef struct pollfd  POLLFD;
 
 typedef struct _VDSOCKS_C2H{
-    VD_C2H Header; //the first field must be a VD_C2H struct, then we put whatever we want
+    VD_C2H Header; //the first fiel d must be a VD_C2H struct, then we put whatever we want
 }VDSOCKS_C2H, * PVDSOCKS_C2H;
 
 //#pragma pack()
